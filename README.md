@@ -168,4 +168,8 @@ pytest tests/ -v
 
 ---
 
+<img width="1506" height="884" alt="image" src="https://github.com/user-attachments/assets/0a5597f3-0726-4624-a239-95949404f3c9" />
+
+---
+
 *Brief M5 – Architecture MLOps CI/CD*
