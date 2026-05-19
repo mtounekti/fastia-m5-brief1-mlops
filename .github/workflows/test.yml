@@ -1,0 +1,51 @@
+# CI/CD – GitHub Actions
+# Déclencheurs :
+#   - push sur main
+#   - pull Request vers main
+# jobs :
+#   - tests : installe les dépendances et lance pytest
+
+name: FastIA – CI Backend Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: Tests pytest – Backend
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+      # checkout du code
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      # installation Python
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # installation des dépendances
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      # run des tests
+      - name: 🧪 Lancement des tests pytest
+        run: |
+          cd backend
+          pytest tests/ -v --tb=short
+
+      # résumé 
+      - name: ✅ Tests terminés
+        if: success()
+        run: echo "Tous les tests sont passés !"
