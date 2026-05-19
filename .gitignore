@@ -17,4 +17,7 @@ Thumbs.db
 .pytest_cache/
 
 # Docker
-*.env
+*.envbackend/.venv/
+frontend/.venv/
+backend/logs/
+frontend/logs/
