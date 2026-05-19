@@ -40,12 +40,12 @@ jobs:
           pip install -r backend/requirements.txt
 
       # run des tests
-      - name: 🧪 Lancement des tests pytest
+      - name: Lancement des tests pytest
         run: |
           cd backend
           pytest tests/ -v --tb=short
 
       # résumé 
-      - name: ✅ Tests terminés
+      - name: Tests terminés
         if: success()
         run: echo "Tous les tests sont passés !"
