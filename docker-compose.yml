@@ -1,0 +1,42 @@
+# =============================================================================
+# docker-compose.yml
+# Orchestration des services FastIA MLOps Template
+# =============================================================================
+# Services :
+#   - backend  : API FastAPI (port 8000)
+#   - frontend : Streamlit  (port 8501)
+# =============================================================================
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastia-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fastia-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://backend:8000
+    volumes:
+      - ./frontend/logs:/app/logs
+    depends_on:
+      - backend
+    restart: unless-stopped
