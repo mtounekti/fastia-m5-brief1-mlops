@@ -172,4 +172,125 @@ pytest tests/ -v
 
 ---
 
-*Brief M5 – Architecture MLOps CI/CD*
+# M5 Brief 2 – CD automatisé vers Docker Hub
+### Pipeline CI/CD complet
+
+---
+
+## Description
+
+Extension du Brief 1 avec un pipeline de **déploiement continu (CD)**
+À chaque push sur `main` les images Docker sont automatiquement
+buildées, taguées et publiées sur Docker Hub via GitHub Actions
+
+---
+
+## Pipeline CI/CD complet
+
+```
+git push → main
+    │
+    ├── test.yml        → pytest (CI)  ✅
+    │
+    └── docker-publish.yml → Build + Push Docker Hub (CD) ✅
+```
+
+---
+
+## 🐳 Images Docker Hub
+
+| Image | Lien |
+|---|---|
+| Backend | [mtounekti/fastia-backend](https://hub.docker.com/r/mtounekti/fastia-backend) |
+| Frontend | [mtounekti/fastia-frontend](https://hub.docker.com/r/mtounekti/fastia-frontend) |
+
+### Pull et run depuis Docker Hub
+
+```bash
+# pull les images
+docker pull mtounekti/fastia-backend:latest
+docker pull mtounekti/fastia-frontend:latest
+
+docker run -p 8000:8000 mtounekti/fastia-backend:latest
+
+docker run -p 8501:8501 -e API_URL=http://localhost:8000 \
+  mtounekti/fastia-frontend:latest
+```
+
+### Tags disponibles
+
+| Tag | Description |
+|---|---|
+| `latest` | Dernière version stable |
+| `<github.sha>` | Hash du commit exact pour traçabilité |
+
+---
+
+## Workflow CD – docker-publish.yml
+
+Déclenché à chaque **push sur `main`** :
+
+1. 📥 Checkout du code
+2. 🐳 Setup Docker Buildx
+3. 🔐 Login Docker Hub (via secrets GitHub)
+4. 💾 Cache Docker layers (optimisation des builds)
+5. 🔨 Build & Push image Backend (`latest` + `sha`)
+6. 🔨 Build & Push image Frontend (`latest` + `sha`)
+7. 🔄 Rotation du cache
+
+---
+
+## Secrets GitHub configurés
+
+| Secret | Valeur |
+|---|---|
+| `DOCKER_USERNAME` | `mtounekti` |
+| `DOCKER_PASSWORD` | Token Docker Hub (jamais exposé) |
+
+---
+
+## Variables d'environnement
+
+Voir `.env.example` pour la configuration :
+
+```bash
+APP_VERSION=1.0.0
+DOCKER_USERNAME=mtounekti
+IMAGE_BACKEND=mtounekti/fastia-backend
+IMAGE_FRONTEND=mtounekti/fastia-frontend
+```
+
+---
+
+## Lancement complet depuis Docker Hub
+
+```bash
+# sans cloner le repo – directement depuis Docker Hub
+docker run -d -p 8000:8000 mtounekti/fastia-backend:latest
+docker run -d -p 8501:8501 -e API_URL=http://localhost:8000 \
+  mtounekti/fastia-frontend:latest
+```
+
+Ou avec docker-compose (après avoir cloné le repo) :
+
+```bash
+docker-compose up
+```
+
+---
+
+## Fichiers ajoutés dans ce brief
+
+```
+fastia-m5-brief1-mlops/
+├── .github/
+│   └── workflows/
+│       ├── test.yml             # CI – pytest (Brief 1)
+│       └── docker-publish.yml  # CD – Docker Hub (Brief 2)
+├── .env.example                 # Template de configuration
+└── README.md
+```
+
+---
+
+*Brief M5 – Architecture MLOps CI/CD + CD Docker Hub*
